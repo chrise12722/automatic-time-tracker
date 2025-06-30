@@ -1,6 +1,7 @@
 import pywinctl as pwc
 import ScriptingBridge
 import time
+from urllib.parse import urlparse
 from firefox_grab_url import get_current_browser_url
 
 while True:
@@ -13,12 +14,15 @@ while True:
           browser = ScriptingBridge.SBApplication.applicationWithBundleIdentifier_("com.google.Chrome")
           window = browser.windows()[0]
           tab = window.activeTab().URL()
+          tab = urlparse(tab).netloc
         case 'Safari':
           browser = ScriptingBridge.SBApplication.applicationWithBundleIdentifier_("com.apple.Safari")
           window = browser.windows()[0]
           tab = window.currentTab().URL()
+          tab = urlparse(tab).netloc
         case 'firefox':
           tab = get_current_browser_url()
+          tab = urlparse(tab).netloc
       print(tab)
     else:
       print(active_app)
