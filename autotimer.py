@@ -12,17 +12,14 @@ while True:
         case 'Google Chrome':
           browser = ScriptingBridge.SBApplication.applicationWithBundleIdentifier_("com.google.Chrome")
           window = browser.windows()[0]
-          tab = window.activeTab()
+          tab = window.activeTab().URL()
         case 'Safari':
           browser = ScriptingBridge.SBApplication.applicationWithBundleIdentifier_("com.apple.Safari")
           window = browser.windows()[0]
-          tab = window.currentTab()
+          tab = window.currentTab().URL()
         case 'firefox':
           tab = get_current_browser_url()
-          if tab:
-            print(tab)
-          else:
-            print("Firefox - No URL available yet")
+      print(tab)
     else:
       print(active_app)
   
