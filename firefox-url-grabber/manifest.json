@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Get Current Tab URL",
+  "version": "1.0",
+  "description": "Returns the current tab's URL",
+  "permissions": ["tabs"],
+  "background": {
+    "scripts": ["background.js"]
+  }
+}
