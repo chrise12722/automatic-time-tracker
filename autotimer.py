@@ -10,7 +10,7 @@ import pandas as pd
 from urllib.parse import urlparse
 from firefox_grab_url import get_current_browser_url
 
-def Track_App(start_time, last_active_app):
+def track_app(start_time, last_active_app):
   active_window = pwc.getActiveWindow()
   if active_window:
     active_app = active_window.getAppName()
@@ -28,7 +28,7 @@ def Track_App(start_time, last_active_app):
           writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
           writer.writeheader()
           csvfile.write('\n')
-      Track_App(start_time, active_app)
+      track_app(start_time, active_app)
     if active_app == 'Google Chrome' or active_app == 'Safari' or active_app == 'firefox':
       match active_app:
         case 'Google Chrome':
@@ -47,7 +47,7 @@ def Track_App(start_time, last_active_app):
       #Is tab the same as last time function ran
       if tab == last_active_app:
         time.sleep(10)
-        Track_App(start_time, tab)
+        track_app(start_time, tab)
       else:
         end_time = datetime.datetime.now().replace(microsecond=0)
         elapsed_seconds = round(end_time.timestamp() - start_time.timestamp())
@@ -68,12 +68,12 @@ def Track_App(start_time, last_active_app):
           print(f"Error writing to file: {e}")
         start_time = datetime.datetime.now().replace(microsecond=0)
         time.sleep(10)
-        Track_App(start_time, tab)
+        track_app(start_time, tab)
     else:
       #Is app the same as last time function ran
       if active_app == last_active_app:
         time.sleep(10)
-        Track_App(start_time, active_app)
+        track_app(start_time, active_app)
       else:
         end_time = datetime.datetime.now().replace(microsecond=0)
         elapsed_seconds = round(end_time.timestamp() - start_time.timestamp())
@@ -95,7 +95,7 @@ def Track_App(start_time, last_active_app):
         # start_time = time.time()
         start_time = datetime.datetime.now().replace(microsecond=0)
         time.sleep(10)
-        Track_App(start_time, active_app)
+        track_app(start_time, active_app)
 
 def sort_csv_file():
   try:
@@ -126,7 +126,7 @@ def sort_csv_file():
 
 
 def run_tracker():
-  Track_App(0, "None")
+  track_app(0, "None")
 
 if __name__ == "__main__":
   #Run sorting function at exit
