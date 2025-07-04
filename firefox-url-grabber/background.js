@@ -19,4 +19,4 @@ async function sendUrlToTimeTracker() {
   }
 }
 
-setInterval(sendUrlToTimeTracker, 10000);
+setInterval(sendUrlToTimeTracker, 5000);
