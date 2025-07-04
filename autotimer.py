@@ -4,6 +4,9 @@ import datetime
 import time
 import csv
 import threading
+import atexit
+import os
+import pandas as pd
 from urllib.parse import urlparse
 from firefox_grab_url import get_current_browser_url
 
@@ -13,8 +16,18 @@ def Track_App(start_time, last_active_app):
     active_app = active_window.getAppName()
     #Initial call to function
     if start_time == 0 and last_active_app == "None":
-      # start_time = time.time()
       start_time = datetime.datetime.now().replace(microsecond=0)
+      empty_csv = False
+      try:
+        df = pd.read_csv('data.csv')
+      except (pd.errors.EmptyDataError):
+        empty_csv = True
+      if empty_csv:
+        with open('data.csv', 'a', newline='') as csvfile:
+          fieldnames=["App/Website", "Start_time", "Stop_time", "Total_time"]
+          writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+          writer.writeheader()
+          csvfile.write('\n')
       Track_App(start_time, active_app)
     if active_app == 'Google Chrome' or active_app == 'Safari' or active_app == 'firefox':
       match active_app:
@@ -36,7 +49,6 @@ def Track_App(start_time, last_active_app):
         time.sleep(10)
         Track_App(start_time, tab)
       else:
-        # end_time = time.time()
         end_time = datetime.datetime.now().replace(microsecond=0)
         elapsed_seconds = round(end_time.timestamp() - start_time.timestamp())
         elapsed_time = str(datetime.timedelta(seconds=elapsed_seconds))
@@ -50,12 +62,10 @@ def Track_App(start_time, last_active_app):
           with open('data.csv', 'a', newline='') as csvfile:
             fieldnames = ["App/Website", "Start_time", "Stop_time", "Total_time"]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            writer.writeheader()
             writer.writerow(tab_data)
             csvfile.write('\n')
         except IOError as e:
           print(f"Error writing to file: {e}")
-        # start_time = time.time()
         start_time = datetime.datetime.now().replace(microsecond=0)
         time.sleep(10)
         Track_App(start_time, tab)
@@ -78,7 +88,6 @@ def Track_App(start_time, last_active_app):
           with open('data.csv', 'a', newline='') as csvfile:
             fieldnames = ["App/Website", "Start_time", "Stop_time", "Total_time"]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            writer.writeheader()
             writer.writerow(app_data)
             csvfile.write('\n')
         except IOError as e:
@@ -88,10 +97,41 @@ def Track_App(start_time, last_active_app):
         time.sleep(10)
         Track_App(start_time, active_app)
 
+def sort_csv_file():
+  try:
+    #Read CSV data
+    rows = []
+    with open('data.csv', 'r', newline='') as csvfile:
+      reader = csv.DictReader(csvfile)
+      for row in reader:
+        rows.append(row)
+
+    if not rows:
+      return
+    
+    sorted_rows = sorted(rows, key=lambda row: row['App/Website'])
+
+    #Write sorted data to CSV
+    with open('data.csv', 'w', newline='') as csvfile:
+      fieldnames=["App/Website", "Start_time", "Stop_time", "Total_time"]
+      writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+      writer.writeheader()
+      for row in sorted_rows:
+        writer.writerow(row)
+        csvfile.write('\n')
+  except FileNotFoundError:
+    print("CSV file was not found")
+  except Exception as e:
+    print(f"Error sorting CSV file: {e}")
+
+
 def run_tracker():
   Track_App(0, "None")
 
 if __name__ == "__main__":
+  #Run sorting function at exit
+  atexit.register(sort_csv_file)
+  
   #Start tracker in background thread
   tracker_thread = threading.Thread(target=run_tracker, daemon=True)
   tracker_thread.start()
