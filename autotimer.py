@@ -5,7 +5,6 @@ import time
 import csv
 import threading
 import atexit
-import os
 import pandas as pd
 from urllib.parse import urlparse
 from firefox_grab_url import get_current_browser_url
