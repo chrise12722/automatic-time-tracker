@@ -26,7 +26,7 @@ def track_app():
       except (pd.errors.EmptyDataError):
         empty_csv = True
       if empty_csv:
-        with open('data.csv', 'a', newline='') as csvfile:
+        with open('data.csv', 'w', newline='') as csvfile:
           fieldnames=["App/Website", "Start_time", "Stop_time", "Total_time"]
           writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
           writer.writeheader()
@@ -116,6 +116,7 @@ def sort_csv_file():
       fieldnames=["App/Website", "Start_time", "Stop_time", "Total_time"]
       writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
       writer.writeheader()
+      csvfile.write('\n')
       for row in sorted_rows:
         writer.writerow(row)
         csvfile.write('\n')
