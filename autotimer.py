@@ -9,13 +9,17 @@ import pandas as pd
 from urllib.parse import urlparse
 from firefox_grab_url import get_current_browser_url
 
-def track_app(start_time, last_active_app):
+
+def track_app():
+  global start_time
+  global last_active_app
   active_window = pwc.getActiveWindow()
   if active_window:
     active_app = active_window.getAppName()
     #Initial call to function
     if start_time == 0 and last_active_app == "None":
       start_time = datetime.datetime.now().replace(microsecond=0)
+      last_active_app = active_app
       empty_csv = False
       try:
         df = pd.read_csv('data.csv')
@@ -27,7 +31,7 @@ def track_app(start_time, last_active_app):
           writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
           writer.writeheader()
           csvfile.write('\n')
-      track_app(start_time, active_app)
+      return
     if active_app == 'Google Chrome' or active_app == 'Safari' or active_app == 'firefox':
       match active_app:
         case 'Google Chrome':
@@ -45,8 +49,7 @@ def track_app(start_time, last_active_app):
           tab = urlparse(tab).netloc
       #Is tab the same as last time function ran
       if tab == last_active_app:
-        time.sleep(10)
-        track_app(start_time, tab)
+        return
       else:
         end_time = datetime.datetime.now().replace(microsecond=0)
         elapsed_seconds = round(end_time.timestamp() - start_time.timestamp())
@@ -66,13 +69,12 @@ def track_app(start_time, last_active_app):
         except IOError as e:
           print(f"Error writing to file: {e}")
         start_time = datetime.datetime.now().replace(microsecond=0)
-        time.sleep(10)
-        track_app(start_time, tab)
+        last_active_app = tab
+        return
     else:
       #Is app the same as last time function ran
       if active_app == last_active_app:
-        time.sleep(10)
-        track_app(start_time, active_app)
+        return
       else:
         end_time = datetime.datetime.now().replace(microsecond=0)
         elapsed_seconds = round(end_time.timestamp() - start_time.timestamp())
@@ -91,10 +93,9 @@ def track_app(start_time, last_active_app):
             csvfile.write('\n')
         except IOError as e:
           print(f"Error writing to file: {e}")
-        # start_time = time.time()
         start_time = datetime.datetime.now().replace(microsecond=0)
-        time.sleep(10)
-        track_app(start_time, active_app)
+        last_active_app = active_app
+        return
 
 def sort_csv_file():
   try:
@@ -123,9 +124,12 @@ def sort_csv_file():
   except Exception as e:
     print(f"Error sorting CSV file: {e}")
 
-
+start_time = 0
+last_active_app = "None"
 def run_tracker():
-  track_app(0, "None")
+  while True:
+    track_app()
+    time.sleep(10)
 
 if __name__ == "__main__":
   #Run sorting function at exit
