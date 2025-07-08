@@ -132,9 +132,31 @@ def run_tracker():
     track_app()
     time.sleep(10)
 
+#Record current app/website at exit
+def exit_record():
+  end_time = datetime.datetime.now().replace(microsecond=0)
+  elapsed_seconds = round(end_time.timestamp() - start_time.timestamp())
+  elapsed_time = str(datetime.timedelta(seconds=elapsed_seconds))
+  app_data = {
+    "App/Website": last_active_app,
+    "Start_time": start_time,
+    "Stop_time": end_time,
+    "Total_time": elapsed_time
+  }
+  try:
+    with open('data.csv', 'a', newline='') as csvfile:
+      fieldnames = ["App/Website", "Start_time", "Stop_time", "Total_time"]
+      writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+      writer.writerow(app_data)
+      csvfile.write('\n')
+  except IOError as e:
+    print(f"Error writing to file: {e}")
+
+
 if __name__ == "__main__":
   #Run sorting function at exit
   atexit.register(sort_csv_file)
+  atexit.register(exit_record)
   
   #Start tracker in background thread
   tracker_thread = threading.Thread(target=run_tracker, daemon=True)
