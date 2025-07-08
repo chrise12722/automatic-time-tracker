@@ -9,6 +9,9 @@ import pandas as pd
 from urllib.parse import urlparse
 from firefox_grab_url import get_current_browser_url
 
+#Global variables
+start_time = 0
+last_active_app = "None"
 
 def track_app():
   global start_time
@@ -125,8 +128,7 @@ def sort_csv_file():
   except Exception as e:
     print(f"Error sorting CSV file: {e}")
 
-start_time = 0
-last_active_app = "None"
+
 def run_tracker():
   while True:
     track_app()
